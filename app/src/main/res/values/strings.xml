@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TestHarness</string>
+    <string name="musicVolumeText">Music Volume</string>
 </resources>
