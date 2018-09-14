@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TestHarness</string>
     <string name="musicVolumeText">Music Volume</string>
+    <string name="microphoneServiceDescription">Service to allow always-listening microphone</string>
 </resources>
