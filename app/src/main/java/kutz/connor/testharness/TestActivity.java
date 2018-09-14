@@ -43,7 +43,7 @@ public class TestActivity extends AppCompatActivity {
                 audioManager.setStreamVolume(audioManager.STREAM_MUSIC, level, 0);
             }
         };
-        
+
         musicVolumeSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
     }
 
