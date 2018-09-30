@@ -2,4 +2,8 @@
     <string name="app_name">TestHarness</string>
     <string name="musicVolumeText">Music Volume</string>
     <string name="microphoneServiceDescription">Service to allow always-listening microphone</string>
+    <string name="startServiceButtonText">Start Service</string>
+    <string name="endServiceButtonText">End Service</string>
+    <string name="microphoneServiceNotificationTitle">Microphone Service Running</string>
+    <string name="microphoneServiceNotificationMessage">allows service to continue listening in background</string>
 </resources>
