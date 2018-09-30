@@ -5,5 +5,8 @@
     <string name="startServiceButtonText">Start Service</string>
     <string name="endServiceButtonText">End Service</string>
     <string name="microphoneServiceNotificationTitle">Microphone Service Running</string>
-    <string name="microphoneServiceNotificationMessage">allows service to continue listening in background</string>
+    <string name="microphoneServiceNotificationMessage">using microphone to analyse your surroundings</string>
+    <string name="microphoneServiceNotificationChannelName">Microphone Service Notification</string>
+    <string name="microphoneServiceNotificationChannelDescription">channel for microphone service notification</string>
+    <string name="microphoneServiceNotificationChannelID">microphone_service_notification_channel</string>
 </resources>
