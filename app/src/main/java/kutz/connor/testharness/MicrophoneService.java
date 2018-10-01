@@ -10,6 +10,8 @@ import android.os.IBinder;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.io.IOException;
+
 public class MicrophoneService extends Service{
 
     private MediaRecorder mediaRecorder;
@@ -18,7 +20,7 @@ public class MicrophoneService extends Service{
     @Override
     public void onCreate()
     {
-        mediaRecorder = new MediaRecorder();
+       MediaRecorder mediaRecorder = null;
     }
 
 
@@ -32,6 +34,7 @@ public class MicrophoneService extends Service{
     @Override
     public int onStartCommand (Intent intent, int flags, int startId)
     {
+
         createNotificationChannel();
         Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
                 .setSmallIcon(android.R.drawable.sym_def_app_icon)
@@ -39,6 +42,9 @@ public class MicrophoneService extends Service{
                 .setContentText(getText(R.string.microphoneServiceNotificationMessage))
                 .build();
         startForeground(ONGOING_NOTIFICATION_ID, notification);
+
+        startMediaRecorder();
+
         return Service.START_STICKY;
     }
 
@@ -62,5 +68,22 @@ public class MicrophoneService extends Service{
         channel.setDescription(description);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
+    }
+
+    private void startMediaRecorder(){
+        if(mediaRecorder == null){
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mediaRecorder.setOutputFile("/dev/null");
+            try{
+                mediaRecorder.prepare();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+            mediaRecorder.start();
+
+        }
     }
 }
