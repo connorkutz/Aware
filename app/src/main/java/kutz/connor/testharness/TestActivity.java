@@ -18,7 +18,7 @@ import android.content.pm.PackageManager;
 
 public class TestActivity extends AppCompatActivity {
 
-    public static int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class TestActivity extends AppCompatActivity {
 
         //initializes seek bar and buttons
         SeekBar musicVolumeSeekBar = (SeekBar)findViewById(R.id.musicVolumeSeekBar);
-        Button startServiceButton = (Button)findViewById(R.id.startServiceButton);
+        final Button startServiceButton = (Button)findViewById(R.id.startServiceButton);
         Button endServiceButton = (Button)findViewById(R.id.endServiceButton);
 
         //gets the current volume and max level of music stream
@@ -62,19 +62,21 @@ public class TestActivity extends AppCompatActivity {
         startServiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int[] permissionResults = {-1};
 
-                ActivityCompat.requestPermissions(TestActivity.this,
-                        new String[]{Manifest.permission.RECORD_AUDIO},
-                        MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
-                onRequestPermissionsResult(MY_PERMISSIONS_REQUEST_RECORD_AUDIO, new String[]{Manifest.permission.RECORD_AUDIO}, permissionResults);
-                if(MY_PERMISSIONS_REQUEST_RECORD_AUDIO == PackageManager.PERMISSION_GRANTED) {
-                    Intent startServiceIntent = new Intent(v.getContext(), MicrophoneService.class);
-                    Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
-                    startForegroundService(startServiceIntent);
+                if (ContextCompat.checkSelfPermission(TestActivity.this, Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // Permission is not granted
+                    ActivityCompat.requestPermissions(TestActivity.this,
+                            new String[]{Manifest.permission.RECORD_AUDIO},
+                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+                }
+                else{
+                    //permission already granted
+                    startMicrophoneService();
                 }
             }
         });
+
         endServiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,5 +85,32 @@ public class TestActivity extends AppCompatActivity {
                 stopService(endServiceIntent);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_RECORD_AUDIO: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // audio-related task you need to do.
+                    startMicrophoneService();
+                }
+                else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(getApplicationContext(), "audio permission not granted", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
+    public void startMicrophoneService(){
+        Intent startServiceIntent = new Intent(this, MicrophoneService.class);
+        Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
+        startForegroundService(startServiceIntent);
     }
 }
