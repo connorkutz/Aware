@@ -72,7 +72,7 @@ public class TestActivity extends AppCompatActivity {
                 }
                 else{
                     //permission already granted
-                    startMicrophoneService();
+                        startMicrophoneService();
                 }
             }
         });
@@ -109,8 +109,13 @@ public class TestActivity extends AppCompatActivity {
     }
 
     public void startMicrophoneService(){
-        Intent startServiceIntent = new Intent(this, MicrophoneService.class);
-        Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
-        startForegroundService(startServiceIntent);
+        if (!MicrophoneService.isRunning) {
+            Intent startServiceIntent = new Intent(this, MicrophoneService.class);
+            Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
+            startForegroundService(startServiceIntent);
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "service already running", Toast.LENGTH_SHORT).show();
+        }
     }
 }

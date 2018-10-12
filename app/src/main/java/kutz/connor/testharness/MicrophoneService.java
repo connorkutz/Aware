@@ -20,6 +20,7 @@ public class MicrophoneService extends Service{
 
     private MediaRecorder mediaRecorder;
     private static final int ONGOING_NOTIFICATION_ID = 1;
+    static boolean isRunning = false;
 
     @Override
     public void onCreate()
@@ -46,16 +47,20 @@ public class MicrophoneService extends Service{
                 .setContentText(getText(R.string.microphoneServiceNotificationMessage))
                 .build();
         startForeground(ONGOING_NOTIFICATION_ID, notification);
-
+        isRunning = true;
         startMediaRecorder();
 
         return Service.START_STICKY;
     }
 
+
     @Override
     //not used because not binding
     public void onDestroy()
-    { }
+    {
+        mediaRecorder.stop();
+        isRunning = false;
+    }
 
     private final class ServiceHandler extends Handler{
         public ServiceHandler(Looper looper){
