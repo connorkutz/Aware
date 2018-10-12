@@ -93,6 +93,19 @@ public class MicrophoneService extends Service{
                 e.printStackTrace();
             }
             mediaRecorder.start();
+
+            while(true){
+                try {
+                    //check volume level
+                    //adjust if changed
+                    //repeat
+                    Thread.sleep(1000);
+                }
+                catch(Exception e){
+
+                }
+
+            }
         }
     }
 
