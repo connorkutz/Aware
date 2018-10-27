@@ -1,31 +1,37 @@
 package kutz.connor.testharness;
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-
+import android.util.Log;
+import android.os.Process
 import java.io.IOException;
 
 public class MicrophoneService extends Service{
 
-    private MediaRecorder mediaRecorder;
+    private MediaRecorder mediaRecorder = null;
     private static final int ONGOING_NOTIFICATION_ID = 1;
-    static boolean isRunning = false;
+    int startingAmplitude;
+    int startingVolume;
+    int maxVolume;
+    int currentAmplitude;
+    private Looper mServiceLooper;
+    private ServiceHandler mServiceHandler;
 
     @Override
     public void onCreate()
     {
-       MediaRecorder mediaRecorder = null;
+       HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_FOREGROUND);
+       thread.start();
+       mServiceLooper = thread.getLooper();
+       mServiceHandler = new ServiceHandler(mServiceLooper);
     }
 
 
@@ -39,17 +45,8 @@ public class MicrophoneService extends Service{
     @Override
     public int onStartCommand (Intent intent, int flags, int startId)
     {
-
-        createNotificationChannel();
-        Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
-                .setSmallIcon(android.R.drawable.sym_def_app_icon)
-                .setContentTitle(getText(R.string.microphoneServiceNotificationTitle))
-                .setContentText(getText(R.string.microphoneServiceNotificationMessage))
-                .build();
-        startForeground(ONGOING_NOTIFICATION_ID, notification);
-        isRunning = true;
-        startMediaRecorder();
-
+        createNotification();
+        mediaRecorder = startMediaRecorder();
         return Service.START_STICKY;
     }
 
@@ -62,13 +59,7 @@ public class MicrophoneService extends Service{
         isRunning = false;
     }
 
-    private final class ServiceHandler extends Handler{
-        public ServiceHandler(Looper looper){
-            super(looper);
-        }
-    }
-
-    private void createNotificationChannel(){
+    private void createNotification(){
         CharSequence name = getString(R.string.microphoneServiceNotificationChannelName);
         String description = getString(R.string.microphoneServiceNotificationChannelDescription);
         String id = getString(R.string.microphoneServiceNotificationChannelID);
@@ -78,9 +69,18 @@ public class MicrophoneService extends Service{
         channel.setDescription(description);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
+
+        createNotification();
+        Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
+                .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                .setContentTitle(getText(R.string.microphoneServiceNotificationTitle))
+                .setContentText(getText(R.string.microphoneServiceNotificationMessage))
+                .build();
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
 
-    private void startMediaRecorder(){
+    private MediaRecorder startMediaRecorder(){
+
         if(mediaRecorder == null){
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -93,17 +93,20 @@ public class MicrophoneService extends Service{
                 e.printStackTrace();
             }
             mediaRecorder.start();
+        }
+        return mediaRecorder;
+    }
 
-            while(true){
-                try {
-                    //check volume level
-                    //adjust if changed
-                    //repeat
-                    Thread.sleep(1000);
-                }
-                catch(Exception e){
+    private final class ServiceHandler extends Handler{
+        public ServiceHandler(Looper looper){
+            super(looper);
+        }
 
-                }
+        public void getCurrentAmplitude(){
+            try{
+                currentAmplitude = mediaRecorder.getMaxAmplitude();
+                Log.d("Amplitude Measurement:", Integer.toString(currentAmplitude));
+            } catch(Exception e){
 
             }
         }
