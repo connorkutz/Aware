@@ -6,13 +6,11 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaRecorder;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.os.Process
 import java.io.IOException;
+
+import static java.lang.Thread.sleep;
 
 public class MicrophoneService extends Service{
 
@@ -22,16 +20,15 @@ public class MicrophoneService extends Service{
     int startingVolume;
     int maxVolume;
     int currentAmplitude;
-    private Looper mServiceLooper;
-    private ServiceHandler mServiceHandler;
+    static boolean isRunning = false;
+    private Thread micThread;
 
     @Override
     public void onCreate()
     {
-       HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_FOREGROUND);
-       thread.start();
-       mServiceLooper = thread.getLooper();
-       mServiceHandler = new ServiceHandler(mServiceLooper);
+        micThread = new Thread();
+        createNotification();
+
     }
 
 
@@ -45,9 +42,18 @@ public class MicrophoneService extends Service{
     @Override
     public int onStartCommand (Intent intent, int flags, int startId)
     {
-        createNotification();
+
         mediaRecorder = startMediaRecorder();
-        return Service.START_STICKY;
+        String currentThreadName = Thread.currentThread().getName();
+        micThread.start();
+        if (Thread.currentThread().getName() == currentThreadName){
+            return START_STICKY;
+        }
+        else{
+            measureAmplitude();
+            isRunning = true;
+        }
+        return START_STICKY;
     }
 
 
@@ -70,7 +76,6 @@ public class MicrophoneService extends Service{
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
 
-        createNotification();
         Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
                 .setSmallIcon(android.R.drawable.sym_def_app_icon)
                 .setContentTitle(getText(R.string.microphoneServiceNotificationTitle))
@@ -97,18 +102,14 @@ public class MicrophoneService extends Service{
         return mediaRecorder;
     }
 
-    private final class ServiceHandler extends Handler{
-        public ServiceHandler(Looper looper){
-            super(looper);
-        }
 
-        public void getCurrentAmplitude(){
-            try{
+    public void measureAmplitude() {
+        while (true) {
+            try {
                 currentAmplitude = mediaRecorder.getMaxAmplitude();
                 Log.d("Amplitude Measurement:", Integer.toString(currentAmplitude));
-            } catch(Exception e){
-
-            }
+                sleep(1000);
+            } catch (Exception e) { }
         }
     }
 

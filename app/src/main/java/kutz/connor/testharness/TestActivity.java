@@ -113,6 +113,7 @@ public class TestActivity extends AppCompatActivity {
             Intent startServiceIntent = new Intent(this, MicrophoneService.class);
             Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
             startForegroundService(startServiceIntent);
+
         }
         else {
             Toast.makeText(getApplicationContext(), "service already running", Toast.LENGTH_SHORT).show();
