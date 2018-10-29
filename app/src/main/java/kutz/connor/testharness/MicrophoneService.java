@@ -1,34 +1,33 @@
 package kutz.connor.testharness;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.IBinder;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import java.io.IOException;
 
-import static java.lang.Thread.sleep;
+import java.io.IOException;
 
 public class MicrophoneService extends Service{
 
-    private MediaRecorder mediaRecorder = null;
+    private MediaRecorder mediaRecorder;
     private static final int ONGOING_NOTIFICATION_ID = 1;
-    int startingAmplitude;
-    int startingVolume;
-    int maxVolume;
-    int currentAmplitude;
     static boolean isRunning = false;
-    private Thread micThread;
+    Thread mediaThread;
 
     @Override
     public void onCreate()
     {
-        micThread = new Thread();
-        createNotification();
-
+        MediaRecorder mediaRecorder = null;
     }
 
 
@@ -42,18 +41,25 @@ public class MicrophoneService extends Service{
     @Override
     public int onStartCommand (Intent intent, int flags, int startId)
     {
+        createNotificationChannel();
+        Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
+                .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                .setContentTitle(getText(R.string.microphoneServiceNotificationTitle))
+                .setContentText(getText(R.string.microphoneServiceNotificationMessage))
+                .build();
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
+        isRunning = true;
+        Runnable r = new Runnable(){
+            public void run(){
+                startMediaRecorder();
+            }
+        };
+        mediaThread = new Thread(r);
+        mediaThread.start();
 
-        mediaRecorder = startMediaRecorder();
-        String currentThreadName = Thread.currentThread().getName();
-        micThread.start();
-        if (Thread.currentThread().getName() == currentThreadName){
-            return START_STICKY;
-        }
-        else{
-            measureAmplitude();
-            isRunning = true;
-        }
-        return START_STICKY;
+
+
+        return Service.START_STICKY;
     }
 
 
@@ -61,11 +67,11 @@ public class MicrophoneService extends Service{
     //not used because not binding
     public void onDestroy()
     {
-        mediaRecorder.stop();
+        //mediaRecorder.stop();
         isRunning = false;
     }
 
-    private void createNotification(){
+    private void createNotificationChannel(){
         CharSequence name = getString(R.string.microphoneServiceNotificationChannelName);
         String description = getString(R.string.microphoneServiceNotificationChannelDescription);
         String id = getString(R.string.microphoneServiceNotificationChannelID);
@@ -75,17 +81,9 @@ public class MicrophoneService extends Service{
         channel.setDescription(description);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
-
-        Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
-                .setSmallIcon(android.R.drawable.sym_def_app_icon)
-                .setContentTitle(getText(R.string.microphoneServiceNotificationTitle))
-                .setContentText(getText(R.string.microphoneServiceNotificationMessage))
-                .build();
-        startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
 
-    private MediaRecorder startMediaRecorder(){
-
+    private void startMediaRecorder(){
         if(mediaRecorder == null){
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -98,18 +96,26 @@ public class MicrophoneService extends Service{
                 e.printStackTrace();
             }
             mediaRecorder.start();
-        }
-        return mediaRecorder;
-    }
 
 
-    public void measureAmplitude() {
-        while (true) {
-            try {
-                currentAmplitude = mediaRecorder.getMaxAmplitude();
-                Log.d("Amplitude Measurement:", Integer.toString(currentAmplitude));
-                sleep(1000);
-            } catch (Exception e) { }
+
+            while(true){
+                try {
+                    int amplitude = mediaRecorder.getMaxAmplitude();
+
+                    Log.d("volume" , Integer.toString(amplitude));
+                    //check volume level
+                    //adjust if changed
+                    //repeat
+                    Thread.sleep(1000);
+                }
+                catch(Exception e){
+                }
+                if(!isRunning){
+                    mediaRecorder.stop();
+                    return;
+                }
+            }
         }
     }
 
