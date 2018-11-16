@@ -1,5 +1,4 @@
 package kutz.connor.testharness;
-
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -9,10 +8,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.*;
+import com.google.maps.android.data.geojson.GeoJsonLayer;
+
+import org.json.JSONObject;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    public static final String CURRENT_LAT_EXTRA = "CURRENT_LATITUDE_EXTRA";
+    public static final String CURRENT_LON_EXTRA = "CURRENT_LONGITUDE_EXTRA";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +43,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        double lat = getIntent().getDoubleExtra(CURRENT_LAT_EXTRA, 0);
+        double lon = getIntent().getDoubleExtra(CURRENT_LON_EXTRA, 0);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(lat, lon))
+                .visible(true)
+        );
+
+        googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 13)
+        );
+    }
+
+    // Accepts GeoJSON formatted object as input and applies it to the map
+    // returns GeoJsonLayer for removal purposes
+    public GeoJsonLayer addOverlay(JSONObject data){
+        GeoJsonLayer layer = new GeoJsonLayer(mMap, data);
+        layer.addLayerToMap();
+        return layer;
+    }
+
+    public void removeOverlay(GeoJsonLayer layer){
+       layer.removeLayerFromMap();
+       return;
     }
 }
