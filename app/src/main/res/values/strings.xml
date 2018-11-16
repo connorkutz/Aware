@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TestHarness</string>
+    <string name="musicVolumeText">Music Volume</string>
+    <string name="microphoneServiceDescription">Service to allow always-listening microphone</string>
+    <string name="startServiceButtonText">Start Service</string>
+    <string name="endServiceButtonText">End Service</string>
+    <string name="microphoneServiceNotificationTitle">Microphone Service Running</string>
+    <string name="microphoneServiceNotificationMessage">using microphone to analyze your surroundings</string>
+    <string name="microphoneServiceNotificationChannelName">Microphone Service Notification</string>
+    <string name="microphoneServiceNotificationChannelDescription">channel for microphone service notification</string>
+    <string name="microphoneServiceNotificationChannelID">microphone_service_notification_channel</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="maps_button">Open Map</string>
+</resources>
