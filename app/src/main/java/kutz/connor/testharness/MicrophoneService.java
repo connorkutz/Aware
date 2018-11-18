@@ -1,28 +1,17 @@
 package kutz.connor.testharness;
-
-import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-
 import java.io.IOException;
-import java.lang.annotation.Documented;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import static java.lang.Thread.sleep;
 
@@ -38,12 +27,18 @@ public class MicrophoneService extends Service{
     static boolean finished = false;
     Thread mediaThread;
     static LinkedList<Integer> avg;
+    AudioManager audioManager;
+    int maximumLevel;
+    int startLevel;
+
 
     @Override
     public void onCreate()
     {
+        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        maximumLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        startLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         avg = new LinkedList<>();
-        MediaRecorder mediaRecorder = null;
         for(int i = 0; i < 5; i++){
             avg.add(1000);
         }
@@ -53,8 +48,7 @@ public class MicrophoneService extends Service{
     @Override
     public IBinder onBind(Intent intent)
     {
-        IBinder iBinder = null;
-        return iBinder;
+        return null;
     }
 
     @Override
@@ -75,8 +69,6 @@ public class MicrophoneService extends Service{
         };
         mediaThread = new Thread(r);
         mediaThread.start();
-
-
 
         return Service.START_STICKY;
     }
@@ -102,7 +94,7 @@ public class MicrophoneService extends Service{
         notificationManager.createNotificationChannel(channel);
     }
 
-    private static class changeVolumeTask extends AsyncTask<Integer, Integer, Long>{
+    private class avgVolumeTask extends AsyncTask<Integer, Integer, Long>{
 
         @Override
         protected Long doInBackground(Integer... level) {
@@ -115,13 +107,33 @@ public class MicrophoneService extends Service{
                 average += avg.get(i);
             }
             average = average / 5;
-            //Log.d("task volume", Integer.toString(currentVolume));
-            Log.d("average", Integer.toString(average));
+            int volume;
+            if(average < NOISE_LEVEL_1){
+                volume = startLevel;
+            }
+            else if(average < NOISE_LEVEL_2){
+                volume = startLevel + 2;
+            }
+            else if(average < NOISE_LEVEL_3){
+                volume = startLevel + 4;
+            }
+            else if(average < NOISE_LEVEL_4){
+                volume = startLevel + 6;
+            }
+            else{
+                volume = startLevel + 8;
+            }
+            if (volume > maximumLevel) {
+                volume = maximumLevel;
+            }
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
             finished = true;
+            Log.d("average", Integer.toString(average));
+            Log.d("volume set", Integer.toString(volume));
             return null;
         }
-
     }
+
 
     private void startMediaRecorder(){
         if(mediaRecorder == null){
@@ -136,27 +148,21 @@ public class MicrophoneService extends Service{
                 e.printStackTrace();
             }
             mediaRecorder.start();
-            //changeVolumeTask task = new changeVolumeTask();
 
 
             while(true){
                 try {
                     int amplitude = mediaRecorder.getMaxAmplitude();
-
                     Log.d("volume" , Integer.toString(amplitude));
                     //finished = false;
-
-                    //while(finished = false);
-
-                    changeVolumeTask task = new changeVolumeTask();
+                    avgVolumeTask task = new avgVolumeTask();
                     task.execute(amplitude);
-                    //check volume level
-                    //adjust if changed
-                    //repeat
+                    //while(finished = false);
                     sleep(1500);
 
                 }
                 catch(Exception e){
+                    Log.d("Exception in startMediaRecorder()", e.toString());
                 }
                 if(!isRunning){
                     mediaRecorder.stop();
