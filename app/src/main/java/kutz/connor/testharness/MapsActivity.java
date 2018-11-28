@@ -1,6 +1,7 @@
 package kutz.connor.testharness;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -8,14 +9,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.*;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
 
 import org.json.JSONObject;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     public static final String CURRENT_LAT_EXTRA = "CURRENT_LATITUDE_EXTRA";
     public static final String CURRENT_LON_EXTRA = "CURRENT_LONGITUDE_EXTRA";
 
@@ -27,7 +27,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        try {
+            mapFragment.getMapAsync(this);
+        }
+        catch(NullPointerException n){
+            Log.d("NPE", n.toString());
+        }
     }
 
 
@@ -42,6 +47,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        GetCrimeDataTask getCrimeDataTask = new GetCrimeDataTask();
+        getCrimeDataTask.execute();
         mMap = googleMap;
         double lat = getIntent().getDoubleExtra(CURRENT_LAT_EXTRA, 0);
         double lon = getIntent().getDoubleExtra(CURRENT_LON_EXTRA, 0);
@@ -58,13 +65,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Accepts GeoJSON formatted object as input and applies it to the map
     // returns GeoJsonLayer for removal purposes
-    public GeoJsonLayer addOverlay(JSONObject data){
+    public static GeoJsonLayer addOverlay(JSONObject data){
         GeoJsonLayer layer = new GeoJsonLayer(mMap, data);
         layer.addLayerToMap();
         return layer;
     }
 
-    public void removeOverlay(GeoJsonLayer layer){
+    public static void removeOverlay(GeoJsonLayer layer){
        layer.removeLayerFromMap();
        return;
     }

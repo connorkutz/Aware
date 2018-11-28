@@ -24,6 +24,7 @@ public class TestActivity extends AppCompatActivity {
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
+    public static MapsActivity mapsActivity;
 
     final LocationHelper locationHelper = new LocationHelper();
 
