@@ -15,9 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
-import android.content.pm.PackageManager;
 
-import com.google.android.gms.maps.model.LatLng;
 
 
 public class TestActivity extends AppCompatActivity {
