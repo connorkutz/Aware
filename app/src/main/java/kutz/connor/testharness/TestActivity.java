@@ -40,6 +40,9 @@ public class TestActivity extends AppCompatActivity {
         final Button startServiceButton = (Button)findViewById(R.id.startServiceButton);
         Button endServiceButton = (Button)findViewById(R.id.endServiceButton);
         Button mapButton = (Button)findViewById(R.id.MapButton);
+        Button startCrimeAlertsButton = (Button)findViewById(R.id.startCrimeAlertsButton);
+        Button stopCrimeAlertsButton = (Button)findViewById(R.id.stopCrimeAlertsButton);
+        Button triggerCrimeAlertButton = (Button)findViewById(R.id.triggerCrimeAlertButton);
 
         //gets the current volume and max level of music stream
         int maximumLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -115,6 +118,29 @@ public class TestActivity extends AppCompatActivity {
                 Intent endServiceIntent = new Intent(v.getContext(), MicrophoneService.class);
                 Toast.makeText(getApplicationContext(), "end service", Toast.LENGTH_SHORT).show();
                 stopService(endServiceIntent);
+            }
+        });
+
+        startCrimeAlertsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Toast.makeText(getApplicationContext(), "start crime alerts", Toast.LENGTH_SHORT).show();
+                CrimeAlertHelper.startCrimeAlerts();
+            }
+        });
+
+        stopCrimeAlertsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Toast.makeText(getApplicationContext(), "stop crime alerts", Toast.LENGTH_SHORT).show();
+                CrimeAlertHelper.isRunning = false;
+            }
+        });
+
+        triggerCrimeAlertButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Toast.makeText(getApplicationContext(), "trigger crime alert", Toast.LENGTH_SHORT).show();
             }
         });
     }
