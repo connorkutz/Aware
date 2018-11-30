@@ -140,6 +140,7 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Toast.makeText(getApplicationContext(), "trigger crime alert", Toast.LENGTH_SHORT).show();
+                new SpeechTask().execute(getApplicationContext(), "crime alert triggered");
             }
         });
     }
