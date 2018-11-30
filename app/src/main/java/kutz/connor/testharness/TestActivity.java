@@ -22,7 +22,6 @@ public class TestActivity extends AppCompatActivity {
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
-    public static MapsActivity mapsActivity;
 
     final LocationHelper locationHelper = new LocationHelper();
 
@@ -36,13 +35,13 @@ public class TestActivity extends AppCompatActivity {
         final LocationHelper locationHelper = new LocationHelper();
 
         //initializes seek bar and buttons
-        SeekBar musicVolumeSeekBar = (SeekBar)findViewById(R.id.musicVolumeSeekBar);
-        final Button startServiceButton = (Button)findViewById(R.id.startServiceButton);
-        Button endServiceButton = (Button)findViewById(R.id.endServiceButton);
-        Button mapButton = (Button)findViewById(R.id.MapButton);
-        Button startCrimeAlertsButton = (Button)findViewById(R.id.startCrimeAlertsButton);
-        Button stopCrimeAlertsButton = (Button)findViewById(R.id.stopCrimeAlertsButton);
-        Button triggerCrimeAlertButton = (Button)findViewById(R.id.triggerCrimeAlertButton);
+        SeekBar musicVolumeSeekBar = findViewById(R.id.musicVolumeSeekBar);
+        final Button startServiceButton = findViewById(R.id.startServiceButton);
+        Button endServiceButton = findViewById(R.id.endServiceButton);
+        Button mapButton = findViewById(R.id.MapButton);
+        Button startCrimeAlertsButton = findViewById(R.id.startCrimeAlertsButton);
+        Button stopCrimeAlertsButton = findViewById(R.id.stopCrimeAlertsButton);
+        Button triggerCrimeAlertButton = findViewById(R.id.triggerCrimeAlertButton);
 
         //gets the current volume and max level of music stream
         int maximumLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -179,7 +178,6 @@ public class TestActivity extends AppCompatActivity {
                     // functionality that depends on this permission.
                     Toast.makeText(getApplicationContext(), "location permission not granted", Toast.LENGTH_LONG).show();
                 }
-                return;
             }
         }
     }
