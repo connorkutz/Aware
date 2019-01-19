@@ -1,4 +1,4 @@
-package kutz.connor.testharness;
+package kutz.connor.Aware;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package kutz.connor.testharness;
+package kutz.connor.Aware;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;

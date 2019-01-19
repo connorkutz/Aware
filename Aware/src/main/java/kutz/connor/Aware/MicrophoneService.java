@@ -1,4 +1,4 @@
-package kutz.connor.testharness;
+package kutz.connor.Aware;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

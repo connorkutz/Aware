@@ -1,4 +1,4 @@
-package kutz.connor.testharness;
+package kutz.connor.Aware;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;

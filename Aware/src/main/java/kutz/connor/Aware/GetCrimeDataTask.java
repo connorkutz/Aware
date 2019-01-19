@@ -1,9 +1,7 @@
-package kutz.connor.testharness;
+package kutz.connor.Aware;
 
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.google.maps.android.data.geojson.GeoJsonFeature;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="kutz.connor.testharness">
+    package="kutz.connor.Aware">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -20,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TestActivity">
+        <activity android:name="kutz.connor.Aware.TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,7 @@
             android:required="false" />
 
         <service
-            android:name=".MicrophoneService"
+            android:name="kutz.connor.Aware.MicrophoneService"
             android:description="@string/microphoneServiceDescription"
             android:directBootAware="true"
             android:enabled="true"></service>
@@ -50,7 +50,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="kutz.connor.Aware.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
     </application>
 
