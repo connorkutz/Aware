@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         final Button logInButton = findViewById(R.id.log_in_button);
         final Button signUpButton = findViewById(R.id.sign_up_button);
-        final EditText emailText = findViewById(R.id.email_text);
+        final EditText emailText = findViewById(R.id.sign_up_email_text);
         final EditText passwordText = findViewById(R.id.password_text);
 
         logInButton.setOnClickListener(new View.OnClickListener() {
@@ -35,6 +35,16 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = emailText.getText().toString();
                 String password = passwordText.getText().toString();
+
+                if(email == null || email == "" || email.isEmpty()){
+                    Toast.makeText(LoginActivity.this, "Please enter email address.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(password == null || password == "" || password.isEmpty()){
+                    Toast.makeText(LoginActivity.this, "Please enter password.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -55,11 +65,10 @@ public class LoginActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
             }
         });
-
-
     }
 
     @Override
@@ -67,7 +76,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        //logIn(currentUser);
+        if (currentUser != null){
+            Log.d("CK", "Current user is " + currentUser.getDisplayName());
+        }
+        else{
+            Log.d("CK", "No one logged in");
+        }
     }
 
     private void logIn(FirebaseUser currentUser){
