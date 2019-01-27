@@ -14,4 +14,12 @@
     <string name="trigger_crime">Trigger Crime Alert</string>
     <string name="start_crime_alerts">Start Crime Alerts</string>
     <string name="stop_crime_alerts">Stop Crime Alerts</string>
+    <string name="Password_Text">password</string>
+    <string name="Email_Text">email</string>
+    <string name="Welcome_Text">Welcome!</string>
+    <string name="log_in_text">Log in</string>
+    <string name="sign_up_text">Sign up</string>
+    <string name="create_account_text">Create Account</string>
+    <string name="password_retype_text">password (retype)</string>
+    <string name="title_activity_maps2">Map</string>
 </resources>

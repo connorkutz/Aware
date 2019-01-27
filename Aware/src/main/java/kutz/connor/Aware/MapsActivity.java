@@ -9,9 +9,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.json.JSONObject;
+
+import java.util.Collection;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -63,16 +68,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         );
     }
 
-    // Accepts GeoJSON formatted object as input and applies it to the map
-    // returns GeoJsonLayer for removal purposes
-    public static GeoJsonLayer addOverlay(JSONObject data){
-        GeoJsonLayer layer = new GeoJsonLayer(mMap, data);
-        layer.addLayerToMap();
-        return layer;
-    }
+    public static void addHeatMap(Collection<LatLng> data){
+        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+                .data(data)
+                .radius(45)
+                .build();
 
-    public static void removeOverlay(GeoJsonLayer layer){
-       layer.removeLayerFromMap();
-       return;
+        TileOverlay overlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+
+        overlay.setVisible(true);
+        overlay.setFadeIn(true);
+        overlay.setTransparency((float)0.11111);
+
+        Log.d("MapsActivity", "added heatmap Transparent: " + overlay.getTransparency());
+
     }
 }
