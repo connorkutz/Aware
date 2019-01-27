@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     Log.d("CK", "log in successful");
-                                    //logIn(user);
+                                    logIn(user);
                                 } else {
                                     Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                                 }
@@ -78,6 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null){
             Log.d("CK", "Current user is " + currentUser.getDisplayName());
+            logIn(currentUser);
         }
         else{
             Log.d("CK", "No one logged in");
@@ -86,6 +87,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void logIn(FirebaseUser currentUser){
         Log.d("CK", "logging in");
+        //get user preferences from fire base
+        //put into sharedPrefs
         Intent intent = new Intent(this, TestActivity.class);
         startActivity(intent);
     }

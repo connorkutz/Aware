@@ -21,4 +21,5 @@
     <string name="sign_up_text">Sign up</string>
     <string name="create_account_text">Create Account</string>
     <string name="password_retype_text">password (retype)</string>
+    <string name="title_activity_maps2">Map</string>
 </resources>

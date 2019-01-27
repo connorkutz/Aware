@@ -3,10 +3,14 @@ package kutz.connor.Aware;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,25 +34,36 @@ public class GetCrimeDataTask extends AsyncTask<Void, Void, JSONObject> {
 
         try(Response response = client.newCall(request).execute()){
             String responseString = response.body().string();
-            Log.d("Crime Data", responseString);
+            Log.d("GetCrimeDataTask", responseString);
             if(response.isSuccessful() && response.body() != null){
                 try {
                     JSONObject geoJSONData = new JSONObject(responseString);
 
                     return geoJSONData;
                 } catch(JSONException j){
-                    Log.d("JSE", j.toString());
+                    Log.d("GetCrimeDataTask", j.toString());
                 }
             }
         }catch(IOException e){
-            Log.d("IOE", e.toString());
+            Log.d("GetCrimeDataTask", e.toString());
         }
         return null;
     }
 
     @Override
     public void onPostExecute(JSONObject result){
-        MapsActivity.addOverlay(result);
-    }
+        LinkedList<LatLng> latLngs = new LinkedList<>();
 
+        try {
+            JSONArray array = result.getJSONArray("features");
+
+            for(int i = 0; i < array.length(); i++){
+                JSONArray coordinates = array.getJSONObject(i).getJSONObject("geometry").getJSONArray("coordinates");
+                latLngs.add(new LatLng(coordinates.getDouble(1), coordinates.getDouble(0)));
+            }
+            MapsActivity.addHeatMap(latLngs);
+        }catch(Exception e) {
+            Log.d("GetCrimeDataTask", e.toString());
+        }
+    }
 }
