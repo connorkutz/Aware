@@ -1,7 +1,11 @@
 package kutz.connor.Aware;
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -11,10 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.data.geojson.GeoJsonLayer;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
-
-import org.json.JSONObject;
 
 import java.util.Collection;
 
@@ -38,6 +39,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         catch(NullPointerException n){
             Log.d("NPE", n.toString());
         }
+
+        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
+        FloatingActionButton serviceButton = findViewById(R.id.serviceButton);
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+        serviceButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+
+            }
+        });
+
     }
 
 
