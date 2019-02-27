@@ -36,12 +36,12 @@ public class LoginActivity extends AppCompatActivity {
                 String email = emailText.getText().toString();
                 String password = passwordText.getText().toString();
 
-                if(email == null || email == "" || email.isEmpty()){
+                if(email == null || email.equals("") || email.isEmpty()){
                     Toast.makeText(LoginActivity.this, "Please enter email address.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(password == null || password == "" || password.isEmpty()){
+                if(password == null || password.equals("")  || password.isEmpty()){
                     Toast.makeText(LoginActivity.this, "Please enter password.", Toast.LENGTH_SHORT).show();
                     return;
                 }
