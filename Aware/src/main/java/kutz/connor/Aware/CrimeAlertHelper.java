@@ -1,6 +1,12 @@
 package kutz.connor.Aware;
 
+import android.content.Context;
+import android.location.Location;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 
@@ -8,68 +14,47 @@ import static java.lang.Thread.sleep;
 
 public class CrimeAlertHelper {
     private static Thread crimeThread;
-    static OkHttpClient client = new OkHttpClient();
     static boolean isRunning;
+    private static UserSettings userSettings;
+    private static CrimeDensityHelper cdHelper;
+    private static final LocationHelper locationHelper = new LocationHelper();
 
 
-    public static void startCrimeAlerts(){
-        Runnable r = new Runnable(){
-            public void run(){
-                pollForCrime();
-            }
-        };
+    public static void startCrimeAlerts(UserSettings currentSettings, final Context context, final ArrayList<LatLng> crimeList){
+        userSettings = currentSettings;
+        if(userSettings.crimeDensityAlertsEnabled) {
+            cdHelper = new CrimeDensityHelper(context);
+            Runnable r = new Runnable() {
+                public void run() {
+                    pollForCrime(context, crimeList);
+                }
+            };
+            crimeThread = new Thread(r);
+            crimeThread.start();
+            isRunning = true;
+        }
 
-        crimeThread = new Thread(r);
-        crimeThread.start();
-        isRunning = true;
     }
 
     public void stopCrimeAlerts(){
         isRunning = false;
     }
 
-    private static void pollForCrime(){
-        while(true) {
-            if (!isRunning) {
-                return;
-            } else {
+    private static void pollForCrime(Context context, ArrayList<LatLng> crimeList){
+        while(isRunning) {
+            if(userSettings.crimeDensityAlertsEnabled){
+
+                Location location =  locationHelper.getCurrentLocation(context);
+                double avg = cdHelper.getAverageCrimeDensity(crimeList);
+                double local = cdHelper.getLocalCrimeDensity(crimeList, location);
+                Log.d("TestActivity", "Avg:" + avg + "\n" + "local:" + local + "\n");
+
+                //wait 2.5 minutes
                 try {
-                    sleep(5000);
-                    Log.d("connor", "polling is running");
-
-                    // http request for crime data within 2000 meters of current location
-                    /*
-                    int radius = 2000; // crime radius in meters
-                    double lon = 0.0;
-                    double lat = 0.0;
-                    String key = "NO_KEY_YET";
-                    String url = ("http://api.spotcrime.com/crimes.json?Lat=" + lat + "&Lon=" + lon + "&Raduis=" + radius);
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .header("key", key)
-                            .build();
-                    try(Response response = client.newCall(request).execute()){
-                        String responseString = response.body().string();
-                        Log.d("Crime Data", responseString);
-                        if(response.isSuccessful() && response.body() != null){
-                            try {
-                                JSONObject crimeAlerts = new JSONObject(responseString);
-
-                                //extract data from crimeAlerts
-                                //look for new instances
-                                //if there is a new alert, publish to user
-
-                            } catch(JSONException j){
-                                Log.d("JSE", j.toString());
-                            }
-                        }
-                    }catch(IOException e){
-                        Log.d("IOE", e.toString());
-                    }
-                    */
-
-                } catch (InterruptedException i) {
-                    Log.d("IE", i.toString());
+                    sleep(150000);
+                }
+                catch(InterruptedException e){
+                    Log.d("CrimeAlertHelper", e.toString());
                 }
             }
         }

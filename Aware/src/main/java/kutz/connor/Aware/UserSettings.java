@@ -3,11 +3,11 @@ package kutz.connor.Aware;
 import android.support.annotation.NonNull;
 
 public class UserSettings {
-    boolean nameRecognitionEnabled;
-    boolean activeVolumeEnabled;
-    boolean noiseRecognitionEnabled;
-    boolean realTimeAlertsEnabled;
-    boolean crimeDensityAlertsEnabled;
+    Boolean nameRecognitionEnabled;
+    Boolean activeVolumeEnabled;
+    Boolean noiseRecognitionEnabled;
+    Boolean realTimeAlertsEnabled;
+    Boolean crimeDensityAlertsEnabled;
 
 
     public UserSettings(){

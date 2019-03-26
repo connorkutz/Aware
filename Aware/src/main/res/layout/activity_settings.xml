@@ -37,7 +37,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+            android:text="@string/active_volume_management"
             app:layout_constraintEnd_toStartOf="@+id/activeVolumeSwitch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +50,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:text="TextView"
+            android:text="@string/active_volume_management_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/activeVolumeSwitch"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +88,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+            android:text="@string/name_recognition_alerts"
             app:layout_constraintEnd_toStartOf="@+id/nameRecognitionSwitch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -101,7 +101,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:text="TextView"
+            android:text="@string/name_recognition_alerts_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/nameRecognitionSwitch"
             app:layout_constraintStart_toStartOf="parent"
@@ -139,7 +139,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+            android:text="@string/real_time_crime_alerts"
             app:layout_constraintEnd_toStartOf="@+id/realTimeAlertsSwitch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -152,7 +152,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:text="TextView"
+            android:text="@string/real_time_crime_alerts_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/realTimeAlertsSwitch"
             app:layout_constraintStart_toStartOf="parent"
@@ -190,7 +190,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+            android:text="@string/crime_density_alerts"
             app:layout_constraintEnd_toStartOf="@+id/crimeDensitySwitch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -200,10 +200,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:text="TextView"
+            android:layout_marginBottom="8dp"
+            android:text="@string/crime_density_alerts_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/crimeDensitySwitch"
             app:layout_constraintStart_toStartOf="parent"
@@ -241,7 +241,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+            android:text="@string/noise_recognition_alerts"
             app:layout_constraintEnd_toStartOf="@+id/noiseRecognitionSwitch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -254,11 +254,21 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:text="TextView"
+            android:text="@string/noise_recognition_alerts_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/noiseRecognitionSwitch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noiseRecognitionText" />
     </android.support.constraint.ConstraintLayout>
+
+    <Button
+        android:id="@+id/developerOptionsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/developer_options"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

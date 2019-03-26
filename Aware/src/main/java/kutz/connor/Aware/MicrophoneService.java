@@ -22,6 +22,12 @@ public class MicrophoneService extends Service{
     private static final int NOISE_LEVEL_2 = 3000;
     private static final int NOISE_LEVEL_3 = 4500;
     private static final int NOISE_LEVEL_4 = 6000;
+    public static boolean activeVolumeEnabled = false;
+    public static boolean crimeDensityEnabled = false;
+    public static boolean nameRecognitionEnabled = false;
+    public static boolean noiseRecognitionEnabled = false;
+    public static boolean realTimeAlertsEnabled = false;
+
     private MediaRecorder mediaRecorder;
     static boolean isRunning = false;
     static boolean finished = false;
@@ -54,6 +60,9 @@ public class MicrophoneService extends Service{
     @Override
     public int onStartCommand (Intent intent, int flags, int startId)
     {
+        activeVolumeEnabled = intent.getBooleanExtra("volume", false);
+        crimeDensityEnabled = intent.getBooleanExtra("density", false);
+
         createNotificationChannel();
         Notification notification = new Notification.Builder(this, getString(R.string.microphoneServiceNotificationChannelID))
                 .setSmallIcon(android.R.drawable.sym_def_app_icon)
@@ -151,18 +160,8 @@ public class MicrophoneService extends Service{
 
 
             while(true){
-                try {
-                    int amplitude = mediaRecorder.getMaxAmplitude();
-                    Log.d("volume" , Integer.toString(amplitude));
-                    //finished = false;
-                    avgVolumeTask task = new avgVolumeTask();
-                    task.execute(amplitude);
-                    //while(finished = false);
-                    sleep(1500);
-
-                }
-                catch(Exception e){
-                    Log.d("Exception in startMediaRecorder()", e.toString());
+                if(activeVolumeEnabled){
+                    checkVolume();
                 }
                 if(!isRunning){
                     mediaRecorder.stop();
@@ -172,6 +171,19 @@ public class MicrophoneService extends Service{
         }
     }
 
+public void checkVolume(){
+    try {
+        int amplitude = mediaRecorder.getMaxAmplitude();
+        Log.d("volume" , Integer.toString(amplitude));
+        //finished = false;
+        new avgVolumeTask().execute(amplitude);
+        //while(finished = false);
+        sleep(1500);
 
+    }
+    catch(Exception e){
+        Log.d("Exception in startMediaRecorder()", e.toString());
+    }
+}
 
 }

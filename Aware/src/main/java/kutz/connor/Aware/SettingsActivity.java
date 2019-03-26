@@ -1,19 +1,27 @@
 package kutz.connor.Aware;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
+import static java.lang.Thread.sleep;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -23,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected Switch nameSwitch;
     protected Switch noiseSwitch;
     protected Switch realTimeSwitch;
+    protected Button developerOptionsButton;
     private DatabaseReference myRef;
 
 
@@ -38,9 +47,11 @@ public class SettingsActivity extends AppCompatActivity {
         nameSwitch = findViewById(R.id.nameRecognitionSwitch);
         noiseSwitch = findViewById(R.id.noiseRecognitionSwitch);
         realTimeSwitch = findViewById(R.id.realTimeAlertsSwitch);
+        developerOptionsButton = findViewById(R.id.developerOptionsButton);
 
 
-        FirebaseUser currentUser = getIntent().getParcelableExtra("user");
+        final FirebaseUser currentUser = getIntent().getParcelableExtra("user");
+        final ArrayList<LatLng> crimeList = getIntent().getParcelableArrayListExtra("crimeList");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference("UserSettings/");
         myRef = myRef.child(currentUser.getUid());
@@ -53,6 +64,12 @@ public class SettingsActivity extends AppCompatActivity {
                 nameSwitch.setChecked(MapsActivity.currentUserSettings.nameRecognitionEnabled);
                 noiseSwitch.setChecked(MapsActivity.currentUserSettings.noiseRecognitionEnabled);
                 realTimeSwitch.setChecked(MapsActivity.currentUserSettings.realTimeAlertsEnabled);
+
+                try {
+                    sleep(200);
+                }catch(InterruptedException e){
+                    Log.d("SettingsActivity", e.toString());
+                }
             }
 
             @Override
@@ -67,6 +84,15 @@ public class SettingsActivity extends AppCompatActivity {
         nameSwitch.setOnCheckedChangeListener(new myOnCheckedChangedListener());
         noiseSwitch.setOnCheckedChangeListener(new myOnCheckedChangedListener());
         realTimeSwitch.setOnCheckedChangeListener(new myOnCheckedChangedListener());
+        developerOptionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingsActivity.this, TestActivity.class);
+                intent.putExtra("user", currentUser);
+                intent.putExtra("crimeList", crimeList);
+                startActivity(intent);
+            }
+        });
 
 
     }
