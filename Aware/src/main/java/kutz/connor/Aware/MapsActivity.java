@@ -1,28 +1,48 @@
 package kutz.connor.Aware;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+
+import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static GoogleMap mMap;
     public static final String CURRENT_LAT_EXTRA = "CURRENT_LATITUDE_EXTRA";
     public static final String CURRENT_LON_EXTRA = "CURRENT_LONGITUDE_EXTRA";
+    public static final UserSettings currentUserSettings = new UserSettings();
+    public static ArrayList<LatLng> crimeList = new ArrayList<>();
+    FirebaseUser currentUser;
 
 
     @Override
@@ -38,6 +58,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         catch(NullPointerException n){
             Log.d("NPE", n.toString());
         }
+
+        currentUser = getIntent().getParcelableExtra("user");
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("UserSettings/");
+        myRef = myRef.child(currentUser.getUid());
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap userSettings = (HashMap)dataSnapshot.getValue();
+                if(userSettings != null) {
+                    currentUserSettings.activeVolumeEnabled = (Boolean) userSettings.get("activeVolumeEnabled");
+                    currentUserSettings.crimeDensityAlertsEnabled = (Boolean) userSettings.get("crimeDensityAlertsEnabled");
+                    currentUserSettings.nameRecognitionEnabled = (Boolean) userSettings.get("nameRecognitionEnabled");
+                    currentUserSettings.noiseRecognitionEnabled = (Boolean) userSettings.get("noiseRecognitionEnabled");
+                    currentUserSettings.realTimeAlertsEnabled = (Boolean) userSettings.get("realTimeAlertsEnabled");
+                }
+                Log.d("MapsActivity", "currentUserSettings: " + currentUserSettings.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("MapsActivity","The read failed: " + databaseError.getCode());
+            }
+        });
+
+        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
+        FloatingActionButton serviceButton = findViewById(R.id.serviceButton);
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
+                intent.putExtra("crimeList", crimeList);
+                intent.putExtra("user", currentUser);
+                startActivity(intent);
+            }
+        });
+        serviceButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // Permission is not granted
+                    ActivityCompat.requestPermissions(MapsActivity.this,
+                            new String[]{Manifest.permission.RECORD_AUDIO},
+                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+                }
+                else{
+                    //permission already granted
+                    startMicrophoneService();
+                    CrimeAlertHelper.startCrimeAlerts(currentUserSettings, MapsActivity.this, crimeList);
+                }
+            }
+        });
+
+
     }
 
 
@@ -55,17 +131,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GetCrimeDataTask getCrimeDataTask = new GetCrimeDataTask();
         getCrimeDataTask.execute();
         mMap = googleMap;
-        double lat = getIntent().getDoubleExtra(CURRENT_LAT_EXTRA, 0);
-        double lon = getIntent().getDoubleExtra(CURRENT_LON_EXTRA, 0);
+        Location location = new LocationHelper().getCurrentLocation(this);
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        googleMap.addCircle(new CircleOptions().center(new LatLng(lat, lon)).fillColor(-16776961).radius(50).strokeWidth(0));
 
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(lat, lon))
-                .visible(true)
-        );
+        //googleMap.addMarker(new MarkerOptions()
+        //        .position(new LatLng(lat, lon))
+        //        .visible(true)
+        //);
 
         googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 13)
+                CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 14)
         );
+    }
+
+    @Override
+    public void onBackPressed(){
+        //do nothing
     }
 
     public static void addHeatMap(Collection<LatLng> data){
@@ -82,5 +165,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Log.d("MapsActivity", "added heatmap Transparent: " + overlay.getTransparency());
 
+    }
+
+    public void startMicrophoneService() {
+        if (!MicrophoneService.isRunning) {
+            Intent startServiceIntent = new Intent(this, MicrophoneService.class);
+            startServiceIntent.putExtra("volume", currentUserSettings.activeVolumeEnabled);
+            startServiceIntent.putExtra("density", currentUserSettings.crimeDensityAlertsEnabled);
+            Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
+            startForegroundService(startServiceIntent);
+
+        } else {
+            Toast.makeText(getApplicationContext(), "service already running", Toast.LENGTH_SHORT).show();
+        }
     }
 }

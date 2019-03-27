@@ -16,6 +16,9 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 
 
 public class TestActivity extends AppCompatActivity {
@@ -23,7 +26,9 @@ public class TestActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
 
-    final LocationHelper locationHelper = new LocationHelper();
+    private static final LocationHelper locationHelper = new LocationHelper();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,7 @@ public class TestActivity extends AppCompatActivity {
         Button startCrimeAlertsButton = findViewById(R.id.startCrimeAlertsButton);
         Button stopCrimeAlertsButton = findViewById(R.id.stopCrimeAlertsButton);
         Button triggerCrimeAlertButton = findViewById(R.id.triggerCrimeAlertButton);
+        Button densityTestButton = findViewById(R.id.densityTestButton);
 
         //gets the current volume and max level of music stream
         int maximumLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -120,27 +126,16 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
-        startCrimeAlertsButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Toast.makeText(getApplicationContext(), "start crime alerts", Toast.LENGTH_SHORT).show();
-                CrimeAlertHelper.startCrimeAlerts();
-            }
-        });
 
-        stopCrimeAlertsButton.setOnClickListener(new View.OnClickListener(){
+        densityTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                Toast.makeText(getApplicationContext(), "stop crime alerts", Toast.LENGTH_SHORT).show();
-                CrimeAlertHelper.isRunning = false;
-            }
-        });
-
-        triggerCrimeAlertButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Toast.makeText(getApplicationContext(), "trigger crime alert", Toast.LENGTH_SHORT).show();
-                new SpeechTask().execute(getApplicationContext(), "crime alert triggered");
+            public void onClick(View v) {
+                CrimeDensityHelper cdHelper = new CrimeDensityHelper(TestActivity.this);
+                Location location =  locationHelper.getCurrentLocation(TestActivity.this);
+                ArrayList<LatLng> crimeList = getIntent().getParcelableArrayListExtra("crimeList");
+                Double avg = cdHelper.getAverageCrimeDensity(crimeList);
+                Double local = cdHelper.getLocalCrimeDensity(crimeList, location);
+                Log.d("TestActivity", "Avg:" + avg + "\n" + "local:" + local + "\n");
             }
         });
     }
@@ -186,6 +181,7 @@ public class TestActivity extends AppCompatActivity {
     public void startMicrophoneService(){
         if (!MicrophoneService.isRunning) {
             Intent startServiceIntent = new Intent(this, MicrophoneService.class);
+
             Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
             startForegroundService(startServiceIntent);
 

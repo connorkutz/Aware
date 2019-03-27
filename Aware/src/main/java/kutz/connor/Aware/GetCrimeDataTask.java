@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import okhttp3.OkHttpClient;
@@ -52,7 +53,7 @@ public class GetCrimeDataTask extends AsyncTask<Void, Void, JSONObject> {
 
     @Override
     public void onPostExecute(JSONObject result){
-        LinkedList<LatLng> latLngs = new LinkedList<>();
+        ArrayList<LatLng> latLngs = new ArrayList<>();
 
         try {
             JSONArray array = result.getJSONArray("features");
@@ -61,6 +62,7 @@ public class GetCrimeDataTask extends AsyncTask<Void, Void, JSONObject> {
                 JSONArray coordinates = array.getJSONObject(i).getJSONObject("geometry").getJSONArray("coordinates");
                 latLngs.add(new LatLng(coordinates.getDouble(1), coordinates.getDouble(0)));
             }
+            MapsActivity.crimeList = latLngs;
             MapsActivity.addHeatMap(latLngs);
         }catch(Exception e) {
             Log.d("GetCrimeDataTask", e.toString());
