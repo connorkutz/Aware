@@ -42,6 +42,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String CURRENT_LON_EXTRA = "CURRENT_LONGITUDE_EXTRA";
     public static final UserSettings currentUserSettings = new UserSettings();
     public static ArrayList<LatLng> crimeList = new ArrayList<>();
+    FloatingActionButton settingsButton;
+    FloatingActionButton serviceButton;
     FirebaseUser currentUser;
 
 
@@ -83,8 +85,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        FloatingActionButton settingsButton = findViewById(R.id.settingsButton);
-        FloatingActionButton serviceButton = findViewById(R.id.serviceButton);
+        settingsButton = findViewById(R.id.settingsButton);
+        serviceButton = findViewById(R.id.serviceButton);
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,21 +100,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         serviceButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.RECORD_AUDIO)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // Permission is not granted
-                    ActivityCompat.requestPermissions(MapsActivity.this,
-                            new String[]{Manifest.permission.RECORD_AUDIO},
-                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+                if(MicrophoneService.isRunning){
+                    stopMicrophoneService();
                 }
                 else{
-                    //permission already granted
                     startMicrophoneService();
+                }
+
+                if(CrimeAlertHelper.isRunning){
+                    CrimeAlertHelper.stopCrimeAlerts();
+                }
+                else {
                     CrimeAlertHelper.startCrimeAlerts(currentUserSettings, MapsActivity.this, crimeList);
                 }
             }
         });
-
 
     }
 
@@ -167,6 +169,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
+    public void stopMicrophoneService() {
+        if (MicrophoneService.isRunning) {
+            Intent endServiceIntent = new Intent(this, MicrophoneService.class);
+            stopService(endServiceIntent);
+            serviceButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_play_arrow_24px));
+
+        } else {
+            Toast.makeText(getApplicationContext(), "service already stopped", Toast.LENGTH_SHORT).show();
+        }
+    }
     public void startMicrophoneService() {
         if (!MicrophoneService.isRunning) {
             Intent startServiceIntent = new Intent(this, MicrophoneService.class);
@@ -174,6 +187,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startServiceIntent.putExtra("density", currentUserSettings.crimeDensityAlertsEnabled);
             Toast.makeText(getApplicationContext(), "start service", Toast.LENGTH_SHORT).show();
             startForegroundService(startServiceIntent);
+            Log.d("MapsActivity", Boolean.toString(MicrophoneService.isRunning));
+            serviceButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_pause_24px));
+
 
         } else {
             Toast.makeText(getApplicationContext(), "service already running", Toast.LENGTH_SHORT).show();

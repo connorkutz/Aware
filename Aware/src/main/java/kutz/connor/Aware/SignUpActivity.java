@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_FINE_LOCATION;
+import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -73,16 +74,16 @@ public class SignUpActivity extends AppCompatActivity {
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             MY_PERMISSIONS_REQUEST_FINE_LOCATION);
                 }
-                if (ContextCompat.checkSelfPermission(SignUpActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (ContextCompat.checkSelfPermission(SignUpActivity.this, Manifest.permission.RECORD_AUDIO)
                         != PackageManager.PERMISSION_GRANTED) {
+                    // Permission is not granted
                     ActivityCompat.requestPermissions(SignUpActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+                            new String[]{Manifest.permission.RECORD_AUDIO},
+                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
                 }
-                if (ContextCompat.checkSelfPermission(SignUpActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(SignUpActivity.this, "Location Service required to use Aware", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                if ((ContextCompat.checkSelfPermission(SignUpActivity.this, Manifest.permission.RECORD_AUDIO)
+                        == PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(SignUpActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED)){
                     createUser(email, password1);
                 }
             }

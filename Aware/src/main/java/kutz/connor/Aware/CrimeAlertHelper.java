@@ -33,10 +33,9 @@ public class CrimeAlertHelper {
             crimeThread.start();
             isRunning = true;
         }
-
     }
 
-    public void stopCrimeAlerts(){
+    public static void stopCrimeAlerts(){
         isRunning = false;
     }
 

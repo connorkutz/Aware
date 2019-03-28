@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_FINE_LOCATION;
+import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -42,12 +43,12 @@ public class LoginActivity extends AppCompatActivity {
                 String email = emailText.getText().toString();
                 String password = passwordText.getText().toString();
 
-                if(email == null || email.equals("") || email.isEmpty()){
+                if(email.equals("") || email.isEmpty()){
                     Toast.makeText(LoginActivity.this, "Please enter email address.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(password == null || password.equals("")  || password.isEmpty()){
+                if(password.equals("")  || password.isEmpty()){
                     Toast.makeText(LoginActivity.this, "Please enter password.", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -58,28 +59,17 @@ public class LoginActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(LoginActivity.this,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             MY_PERMISSIONS_REQUEST_FINE_LOCATION);
-                    if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(LoginActivity.this, "Location Service required to use Aware", Toast.LENGTH_SHORT).show();
-                    }
-                    else{
-                        mAuth.signInWithEmailAndPassword(email, password)
-                                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()) {
-                                            FirebaseUser user = mAuth.getCurrentUser();
-                                            Log.d("CK", "log in successful");
-                                            logIn(user);
-                                        } else {
-                                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                    }
                 }
-                else {
-
+                if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // Permission is not granted
+                    ActivityCompat.requestPermissions(LoginActivity.this,
+                            new String[]{Manifest.permission.RECORD_AUDIO},
+                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
+                }
+                if ((ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.RECORD_AUDIO)
+                        == PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED)){
                     mAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                                 @Override
