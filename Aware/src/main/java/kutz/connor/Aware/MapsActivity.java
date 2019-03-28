@@ -3,6 +3,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -13,10 +14,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlay;
@@ -32,6 +39,7 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
@@ -42,9 +50,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String CURRENT_LON_EXTRA = "CURRENT_LONGITUDE_EXTRA";
     public static final UserSettings currentUserSettings = new UserSettings();
     public static ArrayList<LatLng> crimeList = new ArrayList<>();
+    public static LocationCallback locationCallback;
+    LocationHelper locationHelper;
+    Location currentLocation;
     FloatingActionButton settingsButton;
     FloatingActionButton serviceButton;
     FirebaseUser currentUser;
+    static Circle userMarker;
 
 
     @Override
@@ -84,6 +96,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("MapsActivity","The read failed: " + databaseError.getCode());
             }
         });
+        locationHelper = new LocationHelper(this);
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                currentLocation = locationResult.getLastLocation();
+                CrimeAlertHelper.location = currentLocation;
+                Log.d("MapsActivity", currentLocation.toString());
+                updateLocation(currentLocation);
+            }
+        };
+        locationHelper.startLocationUpdates();
 
         settingsButton = findViewById(R.id.settingsButton);
         serviceButton = findViewById(R.id.serviceButton);
@@ -107,16 +133,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     startMicrophoneService();
                 }
 
+                mMap.clear();
+
                 if(CrimeAlertHelper.isRunning){
                     CrimeAlertHelper.stopCrimeAlerts();
                 }
                 else {
-                    CrimeAlertHelper.startCrimeAlerts(currentUserSettings, MapsActivity.this, crimeList);
+                    CrimeAlertHelper.startCrimeAlerts(currentUserSettings, MapsActivity.this, crimeList, currentLocation);
                 }
             }
         });
 
     }
+
 
 
     /**
@@ -130,27 +159,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
         GetCrimeDataTask getCrimeDataTask = new GetCrimeDataTask();
         getCrimeDataTask.execute();
-        mMap = googleMap;
-        Location location = new LocationHelper().getCurrentLocation(this);
+        Location location = locationHelper.getCurrentLocation(this);
         double lat = location.getLatitude();
         double lon = location.getLongitude();
-        googleMap.addCircle(new CircleOptions().center(new LatLng(lat, lon)).fillColor(-16776961).radius(50).strokeWidth(0));
-
-        //googleMap.addMarker(new MarkerOptions()
-        //        .position(new LatLng(lat, lon))
-        //        .visible(true)
-        //);
-
-        googleMap.animateCamera(
+        userMarker = mMap.addCircle(new CircleOptions().center(new LatLng(lat, lon)).fillColor(-16776961).radius(50).strokeWidth(0));
+        mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 14)
         );
     }
 
+    //@Override
+    //public void onResume(){
+    //    updateLocation(currentLocation);
+    //}
     @Override
     public void onBackPressed(){
         //do nothing
+    }
+
+    public static void updateLocation(Location location){
+        userMarker.remove();
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        userMarker = mMap.addCircle(new CircleOptions().center(new LatLng(lat, lon)).fillColor(-16776961).radius(50).strokeWidth(0));
+        mMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 14)
+        );
     }
 
     public static void addHeatMap(Collection<LatLng> data){

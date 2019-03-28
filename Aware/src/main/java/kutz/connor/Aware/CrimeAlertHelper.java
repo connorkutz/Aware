@@ -17,10 +17,11 @@ public class CrimeAlertHelper {
     static boolean isRunning;
     private static UserSettings userSettings;
     private static CrimeDensityHelper cdHelper;
-    private static final LocationHelper locationHelper = new LocationHelper();
+    public static Location location;
 
 
-    public static void startCrimeAlerts(UserSettings currentSettings, final Context context, final ArrayList<LatLng> crimeList){
+    public static void startCrimeAlerts(UserSettings currentSettings, final Context context, final ArrayList<LatLng> crimeList, Location givenLocation){
+        location = givenLocation;
         userSettings = currentSettings;
         if(userSettings.crimeDensityAlertsEnabled) {
             cdHelper = new CrimeDensityHelper(context);
@@ -43,7 +44,6 @@ public class CrimeAlertHelper {
         while(isRunning) {
             if(userSettings.crimeDensityAlertsEnabled){
 
-                Location location =  locationHelper.getCurrentLocation(context);
                 double avg = cdHelper.getAverageCrimeDensity(crimeList);
                 double local = cdHelper.getLocalCrimeDensity(crimeList, location);
                 Log.d("TestActivity", "Avg:" + avg + "\n" + "local:" + local + "\n");

@@ -26,7 +26,7 @@ public class TestActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
 
-    private static final LocationHelper locationHelper = new LocationHelper();
+    private LocationHelper locationHelper;
 
 
 
@@ -37,7 +37,7 @@ public class TestActivity extends AppCompatActivity {
 
         //creates and instance of AudioManager
         final AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        final LocationHelper locationHelper = new LocationHelper();
+        final LocationHelper locationHelper = new LocationHelper(this);
 
         //initializes seek bar and buttons
         SeekBar musicVolumeSeekBar = findViewById(R.id.musicVolumeSeekBar);
