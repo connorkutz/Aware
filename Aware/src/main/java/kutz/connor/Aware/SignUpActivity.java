@@ -23,8 +23,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_FINE_LOCATION;
-import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
+
+import static kutz.connor.Aware.MapsActivity.MY_PERMISSIONS_REQUEST_FINE_LOCATION;
+import static kutz.connor.Aware.MapsActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -90,7 +91,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    private void createUser(String email, String password){
+    private void createUser(final String email, String password){
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -98,7 +99,7 @@ public class SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("CK", "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            final FirebaseUser user = mAuth.getCurrentUser();
                             initializeUserSettings(user);
                             Intent intent = new Intent(SignUpActivity.this, MapsActivity.class);
                             intent.putExtra("user", user);
@@ -115,11 +116,11 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void initializeUserSettings(@Nullable FirebaseUser user){
         if(user != null) {
-            DatabaseReference myRef = database.getReference("UserSettings/");
-            myRef.child(user.getUid()).setValue(new UserSettings());
+            DatabaseReference myRef = database.getReference(user.getUid());
+            myRef.child("UserSettings").setValue(new UserSettings());
         }
         else{
-            Log.d("SignUpActivity", "failed to initialize new user settings(user is null");
+            Log.d("SignUpActivity", "failed to initialize new user settings(user is null)");
         }
     }
 }

@@ -3,13 +3,11 @@ package kutz.connor.Aware
 import android.content.Context
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.tasks.Task
 
-class CrimeDensityHelper(context: Context) {
+class CrimeDensityHelper(val context: Context) {
 
     private val dcSquareMileage = 68.34
     private val highCrimeThreshold = 500
-    private val context: Context = context;
 
 
     fun getAverageCrimeDensity(latLonList: List<LatLng>): Double{
@@ -42,8 +40,7 @@ class CrimeDensityHelper(context: Context) {
     }
 
     private fun alertHighCrimeDensity(){
-        var speechTask: SpeechTask = SpeechTask()
-        speechTask.execute(context, "Warning, crime density is higher than average")
+        Alert("Crime density is higher than average").announce(context)
     }
 
 }

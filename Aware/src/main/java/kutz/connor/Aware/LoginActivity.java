@@ -20,8 +20,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_FINE_LOCATION;
-import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
+import static kutz.connor.Aware.MapsActivity.MY_PERMISSIONS_REQUEST_FINE_LOCATION;
+import static kutz.connor.Aware.MapsActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
 public class LoginActivity extends AppCompatActivity {
 

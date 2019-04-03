@@ -1,24 +1,16 @@
 package kutz.connor.Aware;
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,24 +25,28 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
 
-import static kutz.connor.Aware.TestActivity.MY_PERMISSIONS_REQUEST_RECORD_AUDIO;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static GoogleMap mMap;
-    public static final String CURRENT_LAT_EXTRA = "CURRENT_LATITUDE_EXTRA";
-    public static final String CURRENT_LON_EXTRA = "CURRENT_LONGITUDE_EXTRA";
+    public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    public static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 2;
     public static final UserSettings currentUserSettings = new UserSettings();
     public static ArrayList<LatLng> crimeList = new ArrayList<>();
     public static LocationCallback locationCallback;
+    public static DatabaseReference alertsRef;
+    public static DatabaseReference settingsRef;
+    private int numAlerts = 0;
     LocationHelper locationHelper;
     Location currentLocation;
     FloatingActionButton settingsButton;
@@ -75,8 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         currentUser = getIntent().getParcelableExtra("user");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("UserSettings/");
-        myRef = myRef.child(currentUser.getUid());
+        DatabaseReference myRef = database.getReference(currentUser.getUid());
+        myRef = myRef.child("UserSettings");
+        settingsRef = myRef;
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -96,6 +93,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("MapsActivity","The read failed: " + databaseError.getCode());
             }
         });
+        myRef = database.getReference("Alerts");
+        alertsRef = myRef;
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<List<Alert>> t = new GenericTypeIndicator<List<Alert>>() {};
+                List<Alert> alerts = dataSnapshot.getValue(t);
+                if(currentUserSettings.realTimeAlertsEnabled) {
+                    if (alerts != null) {
+                        //Log.d("MapsActivity:", "alerts type = " + alerts.getClass().getName());
+                        //Log.d("MapsActivity", "currentAlerts: " + alerts.toString());
+                        //ArrayList<Alert> myAlerts = ((ArrayList<Alert>) alerts);
+                        if (alerts.size() > numAlerts) {
+                            numAlerts = alerts.size();
+                            playLatestAlert(alerts);
+                        }
+                    } else {
+                        numAlerts = 0;
+                    }
+                }
+            }
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("MapsActivity","The read failed: " + databaseError.getCode());
+            }
+        });
+
         locationHelper = new LocationHelper(this);
         locationCallback = new LocationCallback() {
             @Override
@@ -133,8 +156,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     startMicrophoneService();
                 }
 
-                mMap.clear();
-
                 if(CrimeAlertHelper.isRunning){
                     CrimeAlertHelper.stopCrimeAlerts();
                 }
@@ -162,26 +183,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         GetCrimeDataTask getCrimeDataTask = new GetCrimeDataTask();
         getCrimeDataTask.execute();
-        Location location = locationHelper.getCurrentLocation(this);
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-        userMarker = mMap.addCircle(new CircleOptions().center(new LatLng(lat, lon)).fillColor(-16776961).radius(50).strokeWidth(0));
-        mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 14)
-        );
     }
 
-    //@Override
-    //public void onResume(){
-    //    updateLocation(currentLocation);
-    //}
     @Override
     public void onBackPressed(){
         //do nothing
     }
 
     public static void updateLocation(Location location){
-        userMarker.remove();
+        if(userMarker != null)
+            userMarker.remove();
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         userMarker = mMap.addCircle(new CircleOptions().center(new LatLng(lat, lon)).fillColor(-16776961).radius(50).strokeWidth(0));
@@ -217,6 +228,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(getApplicationContext(), "service already stopped", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void playLatestAlert(List<Alert> alerts){
+        Alert latest = alerts.get(alerts.size() - 1);
+        latest.announce(this);
+    }
+
+    private void playAllAlerts(ArrayList<Alert> alerts){
+        Iterator<Alert> i = alerts.iterator();
+
+        while(i.hasNext()){
+            Alert a = i.next();
+            a.announce(this);
+        }
+    }
+
     public void startMicrophoneService() {
         if (!MicrophoneService.isRunning) {
             Intent startServiceIntent = new Intent(this, MicrophoneService.class);

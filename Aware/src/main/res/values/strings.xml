@@ -24,15 +24,16 @@
     <string name="title_activity_maps2">Map</string>
     <string name="title_activity_settings">Settings</string>
     <string name="active_volume_management">Active Volume Management</string>
-    <string name="active_volume_management_description">description</string>
+    <string name="active_volume_management_description">Adjusts output volume to compensate for ambient noise level</string>
     <string name="crime_density_alerts">Crime Density Alerts</string>
-    <string name="crime_density_alerts_description">description</string>
+    <string name="crime_density_alerts_description">Alerts user when entering areas with higher than average crime rates</string>
     <string name="name_recognition_alerts">Name Recognition Alerts</string>
-    <string name="name_recognition_alerts_description">description</string>
+    <string name="name_recognition_alerts_description">Alerts the user when their name is detected using microphone</string>
     <string name="noise_recognition_alerts">Noise Recognition Alerts</string>
-    <string name="noise_recognition_alerts_description">description</string>
+    <string name="noise_recognition_alerts_description">Alerts the user when dangerous noises, like gunshots and sirens are detected</string>
     <string name="real_time_crime_alerts">Real Time Crime Alerts</string>
-    <string name="real_time_crime_alerts_description">description</string>
+    <string name="real_time_crime_alerts_description">Alerts the user of possible dangerous crime incidents in their vicinity</string>
     <string name="developer_options">Developer Options</string>
     <string name="density_test_text">Density Test</string>
+    <string name="alerts_button_text">View Active Alerts</string>
 </resources>

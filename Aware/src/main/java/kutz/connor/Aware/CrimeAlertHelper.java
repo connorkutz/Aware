@@ -17,10 +17,10 @@ public class CrimeAlertHelper {
     static boolean isRunning;
     private static UserSettings userSettings;
     private static CrimeDensityHelper cdHelper;
-    public static Location location;
+    static Location location;
 
 
-    public static void startCrimeAlerts(UserSettings currentSettings, final Context context, final ArrayList<LatLng> crimeList, Location givenLocation){
+    static void startCrimeAlerts(UserSettings currentSettings, final Context context, final ArrayList<LatLng> crimeList, Location givenLocation){
         location = givenLocation;
         userSettings = currentSettings;
         if(userSettings.crimeDensityAlertsEnabled) {
@@ -36,7 +36,7 @@ public class CrimeAlertHelper {
         }
     }
 
-    public static void stopCrimeAlerts(){
+    static void stopCrimeAlerts(){
         isRunning = false;
     }
 

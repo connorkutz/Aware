@@ -53,23 +53,22 @@ public class SettingsActivity extends AppCompatActivity {
         final FirebaseUser currentUser = getIntent().getParcelableExtra("user");
         final ArrayList<LatLng> crimeList = getIntent().getParcelableArrayListExtra("crimeList");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("UserSettings/");
-        myRef = myRef.child(currentUser.getUid());
+        myRef = database.getReference(currentUser.getUid());
+        myRef = myRef.child("UserSettings");
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    sleep(500);
+                }catch(InterruptedException e){
+                    Log.d("SettingsActivity", e.toString());
+                }
                 //update switches to reflect changes
                 volumeSwitch.setChecked(MapsActivity.currentUserSettings.activeVolumeEnabled);
                 densitySwitch.setChecked(MapsActivity.currentUserSettings.crimeDensityAlertsEnabled);
                 nameSwitch.setChecked(MapsActivity.currentUserSettings.nameRecognitionEnabled);
                 noiseSwitch.setChecked(MapsActivity.currentUserSettings.noiseRecognitionEnabled);
                 realTimeSwitch.setChecked(MapsActivity.currentUserSettings.realTimeAlertsEnabled);
-
-                try {
-                    sleep(200);
-                }catch(InterruptedException e){
-                    Log.d("SettingsActivity", e.toString());
-                }
             }
 
             @Override
