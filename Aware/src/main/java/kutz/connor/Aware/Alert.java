@@ -23,7 +23,8 @@ public class Alert {
 
     public void announce(Context context){
         SpeechTask speechTask = new SpeechTask();
-        speechTask.execute(context, "Warning, " + description);
+        String announcement = "Warning, " + description + " near your area";
+        speechTask.execute(context, announcement);
     }
 
     public String toString(){

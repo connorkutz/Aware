@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 public class TestActivity extends AppCompatActivity {
@@ -44,11 +45,9 @@ public class TestActivity extends AppCompatActivity {
         findViewById(R.id.createAlertButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(myAlerts == null){
-                    myAlerts = new ArrayList<>();
-                }
-                myAlerts.add(new Alert("test alert"));
-                myRef.setValue(myAlerts);
+
+                MapsActivity.createAlert("test alert");
+
             }
         });
 

@@ -53,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     FloatingActionButton serviceButton;
     FirebaseUser currentUser;
     static Circle userMarker;
+    static ArrayList<Alert> myAlerts;
 
 
     @Override
@@ -105,6 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //Log.d("MapsActivity:", "alerts type = " + alerts.getClass().getName());
                         //Log.d("MapsActivity", "currentAlerts: " + alerts.toString());
                         //ArrayList<Alert> myAlerts = ((ArrayList<Alert>) alerts);
+                        myAlerts = (ArrayList<Alert>) dataSnapshot.getValue();
                         if (alerts.size() > numAlerts) {
                             numAlerts = alerts.size();
                             playLatestAlert(alerts);
@@ -257,5 +259,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             Toast.makeText(getApplicationContext(), "service already running", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static void createAlert(String description){
+        Alert alert = new Alert(description);
+        if(myAlerts == null){
+            myAlerts = new ArrayList<>();
+        }
+        myAlerts.add(alert);
+        alertsRef.setValue(myAlerts);
+
     }
 }

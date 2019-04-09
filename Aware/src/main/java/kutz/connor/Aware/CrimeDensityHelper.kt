@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 class CrimeDensityHelper(val context: Context) {
 
     private val dcSquareMileage = 68.34
-    private val highCrimeThreshold = 500
+    private val highCrimeThreshold = 200
 
 
     fun getAverageCrimeDensity(latLonList: List<LatLng>): Double{
