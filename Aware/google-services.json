@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "277426483744",
-    "firebase_url": "https://aware-32285.firebaseio.com",
-    "project_id": "aware-32285",
-    "storage_bucket": "aware-32285.appspot.com"
+    "project_number": "657698587640",
+    "firebase_url": "https://aware-1dffd.firebaseio.com",
+    "project_id": "aware-1dffd",
+    "storage_bucket": "aware-1dffd.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:277426483744:android:d313109df4d02be3",
+        "mobilesdk_app_id": "1:657698587640:android:d313109df4d02be3",
         "android_client_info": {
           "package_name": "kutz.connor.Aware"
         }
       },
       "oauth_client": [
         {
-          "client_id": "277426483744-jn8m0e1sds3lk5ujahfofg88meo0o79r.apps.googleusercontent.com",
+          "client_id": "657698587640-mcaul3ahmjokhli24d5os70fqb4vtfhl.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDnQWY1H4Y4Qalws6SvO_dq62KFk8eaORw"
+          "current_key": "AIzaSyCWPgkqDgWMffgHIdNQmZZTQwXu3R6uhxg"
         }
       ],
       "services": {

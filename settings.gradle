@@ -1,1 +1,1 @@
-include ':Aware'
+include ':Aware', ':aars'
