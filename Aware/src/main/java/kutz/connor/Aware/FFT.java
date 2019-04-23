@@ -2,9 +2,11 @@
 OC Volume - Java Speech Recognition Engine
 Copyright (c) 2002-2004, OrangeCow organization
 All rights reserved.
+
 Redistribution and use in source and binary forms,
 with or without modification, are permitted provided
 that the following conditions are met:
+
  * Redistributions of source code must retain the
 above copyright notice, this list of conditions
 and the following disclaimer.
@@ -18,6 +20,7 @@ nor the names of its contributors may be used to
 endorse or promote products derived from this
 software without specific prior written
 permission.
+
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
 AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -34,16 +37,15 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
 Contact information:
 Please visit http://ocvolume.sourceforge.net.
  */
 //package org.ioe.tprsa.audio.feature;
 
-package kutz.connor.Aware;
+package edu.polyu.mfcc;
 
 /**
- * Fast Fourier Transform.
- *
  * last updated on June 15, 2002<br>
  * <b>description:</b> FFT class for real signals. Upon entry, N contains the
  * numbers of points in the DFT, real[] and imaginary[] contain the real and
@@ -51,36 +53,61 @@ package kutz.connor.Aware;
  * DFT output. All signals run from 0 to N - 1<br>
  * <b>input:</b> speech signal<br>
  * <b>output:</b> real and imaginary part of DFT output
- *
+ * 
  * @author Danny Su
- * @author Hanns Holger Rutz
  */
 public class FFT {
-    double[] real;
-    double[] imag;
+
+	private int numPoints;
+	private float real[];
+	private float imag[];
+
+	public FFT(int numPoints) {
+		this.numPoints = numPoints;
+		real = new float[numPoints];
+		imag = new float[numPoints];		
+	}
+		
+	public void computeFFT(float signal[]) {
+		if (signal.length != this.numPoints) {
+			System.err.println("Error in FFT: signal length mismatch.");
+		}
+		// Move the N point signal into the real part of the complex DFT's time domain
+		// Set all of the samples in the imaginary part to zero
+		real = signal;
+		for (int i = 0; i < imag.length; i++) {
+			real[i] = signal[i];
+			imag[i] = (float)0.0;
+		}
+		// perform FFT using the real & imag array. Return results in real[] and imag[]
+		doFFT();
+	}
+
+	public float[] getReal() {
+		return real;
+	}
+
+	public float[] getImag() {
+		return imag;
+	}
 
 	/**
-	 * Performs Fast Fourier Transformation in place.
+	 * performs Fast Fourier Transformation<br>
 	 */
-	public void process(double[] signal) {
-		final int numPoints = signal.length;
-		// initialize real & imag array
-		real = signal;
-    	imag = new double[numPoints];
-
-		// perform FFT using the real & imag array
+	private void doFFT() {
+		if (numPoints == 1) { return; }
 		final double pi = Math.PI;
 		final int numStages = (int) (Math.log(numPoints) / Math.log(2));
-		final int halfNumPoints = numPoints >> 1;
+		int halfNumPoints = numPoints >> 1;
 		int j = halfNumPoints;
 		// FFT time domain decomposition carried out by "bit reversal sorting"
 		// algorithm
-		int k;
+		int k = 0;
 		for (int i = 1; i < numPoints - 2; i++) {
 			if (i < j) {
 				// swap
-				double tempReal = real[j];
-				double tempImag = imag[j];
+				float tempReal = real[j];
+				float tempImag = imag[j];
 				real[j] = real[i];
 				imag[j] = imag[i];
 				real[i] = tempReal;
@@ -100,20 +127,20 @@ public class FFT {
 			for (int i = 0; i < stage; i++) {
 				LE <<= 1;
 			}
-            final int LE2 = LE >> 1;
+			int LE2 = LE >> 1;
 			double UR = 1;
 			double UI = 0;
 			// calculate sine & cosine values
-			final double SR =  Math.cos(pi / LE2);
-            final double SI = -Math.sin(pi / LE2);
+			double SR = Math.cos(pi / LE2);
+			double SI = -Math.sin(pi / LE2);
 			// loop for each sub DFT
 			for (int subDFT = 1; subDFT <= LE2; subDFT++) {
 				// loop for each butterfly
 				for (int butterfly = subDFT - 1; butterfly <= numPoints - 1; butterfly += LE) {
 					int ip = butterfly + LE2;
 					// butterfly calculation
-					double tempReal = (double) (real[ip] * UR - imag[ip] * UI);
-					double tempImag = (double) (real[ip] * UI + imag[ip] * UR);
+					float tempReal = (float) (real[ip] * UR - imag[ip] * UI);
+					float tempImag = (float) (real[ip] * UI + imag[ip] * UR);
 					real[ip] = real[butterfly] - tempReal;
 					imag[ip] = imag[butterfly] - tempImag;
 					real[butterfly] += tempReal;
