@@ -145,6 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                 intent.putExtra("crimeList", crimeList);
                 intent.putExtra("user", currentUser);
+                intent.putExtra("settings", currentUserSettings);
                 startActivity(intent);
             }
         });
@@ -155,7 +156,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     stopMicrophoneService();
                 }
                 else{
-                    startMicrophoneService();
+                    if(currentUserSettings.activeVolumeEnabled) {
+                        startMicrophoneService();
+                    }
                 }
 
                 if(CrimeAlertHelper.isRunning){
@@ -174,8 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -268,6 +270,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         myAlerts.add(alert);
         alertsRef.setValue(myAlerts);
+    }
 
+    public static void clearAllAlerts(){
+        myAlerts = new ArrayList<>();
+        alertsRef.setValue(myAlerts);
+    }
+
+    public static void createSampleCrimeAlert(){
+        Alert alert = new Alert("a robbery was reported at the M Street CVS");
+        if(myAlerts == null){
+            myAlerts = new ArrayList<>();
+        }
+        myAlerts.add(alert);
+        alertsRef.setValue(myAlerts);
     }
 }

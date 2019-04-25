@@ -16,7 +16,7 @@ class LocationHelper {
     void startLocationUpdates(){
         LocationRequest locationRequest = new LocationRequest();
         //interval to update every 2.5 minutes
-        locationRequest.setInterval(150000);
+        locationRequest.setInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         fusedLocationClient.requestLocationUpdates(locationRequest,
                 MapsActivity.locationCallback,

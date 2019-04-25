@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
@@ -52,30 +53,15 @@ public class SettingsActivity extends AppCompatActivity {
 
         final FirebaseUser currentUser = getIntent().getParcelableExtra("user");
         final ArrayList<LatLng> crimeList = getIntent().getParcelableArrayListExtra("crimeList");
+        final UserSettings userSettings = (UserSettings)getIntent().getSerializableExtra("settings");
+        volumeSwitch.setChecked(userSettings.activeVolumeEnabled);
+        densitySwitch.setChecked(userSettings.crimeDensityAlertsEnabled);
+        nameSwitch.setChecked(userSettings.nameRecognitionEnabled);
+        noiseSwitch.setChecked(userSettings.noiseRecognitionEnabled);
+        realTimeSwitch.setChecked(userSettings.realTimeAlertsEnabled);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference(currentUser.getUid());
         myRef = myRef.child("UserSettings");
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    sleep(500);
-                }catch(InterruptedException e){
-                    Log.d("SettingsActivity", e.toString());
-                }
-                //update switches to reflect changes
-                volumeSwitch.setChecked(MapsActivity.currentUserSettings.activeVolumeEnabled);
-                densitySwitch.setChecked(MapsActivity.currentUserSettings.crimeDensityAlertsEnabled);
-                nameSwitch.setChecked(MapsActivity.currentUserSettings.nameRecognitionEnabled);
-                noiseSwitch.setChecked(MapsActivity.currentUserSettings.noiseRecognitionEnabled);
-                realTimeSwitch.setChecked(MapsActivity.currentUserSettings.realTimeAlertsEnabled);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("SettingsActivity","The read failed: " + databaseError.getCode());
-            }
-        });
 
 
         volumeSwitch.setOnCheckedChangeListener(new myOnCheckedChangedListener());

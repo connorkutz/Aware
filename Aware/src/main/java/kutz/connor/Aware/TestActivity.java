@@ -45,9 +45,19 @@ public class TestActivity extends AppCompatActivity {
         findViewById(R.id.createAlertButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 MapsActivity.createAlert("test alert");
-
+            }
+        });
+        findViewById(R.id.clearAlertsButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapsActivity.clearAllAlerts();
+            }
+        });
+        findViewById(R.id.createCrimeAlertButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                MapsActivity.createSampleCrimeAlert();
             }
         });
 

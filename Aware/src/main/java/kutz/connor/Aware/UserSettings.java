@@ -1,13 +1,17 @@
 package kutz.connor.Aware;
 
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-public class UserSettings {
+import java.io.Serializable;
+
+public class UserSettings implements Serializable {
     public Boolean nameRecognitionEnabled;
     public Boolean activeVolumeEnabled;
     public Boolean noiseRecognitionEnabled;
     public Boolean realTimeAlertsEnabled;
     public Boolean crimeDensityAlertsEnabled;
+
 
 
     public UserSettings(){
