@@ -10,9 +10,11 @@
  * Date: March 2015 
  */
 
-package edu.polyu.mfcc;
+package kutz.connor.Aware;
+import android.util.Log;
+
 import java.util.Iterator;
-import org.apache.commons.collections.Buffer;
+
 
 public class MFCC {
 
@@ -79,7 +81,8 @@ public class MFCC {
 		scaleCep(cepc);
 		
 		// Replace C_0 by logEnergy, according to melcepst.m in voicebox
-		cepc[0] = logE;
+		cepc[0] = (float) logE;
+
 		return cepc;
 	}
 
@@ -273,33 +276,5 @@ public class MFCC {
 	private double log10(double value) {
 		return Math.log(value) / Math.log(10);
 	}
-	
-	@SuppressWarnings("unchecked")
-	public double[] compDeltaMfcc(Buffer buf, int dim) {
-		int bufSize = buf.size();
-		double dMfcc[] = new double[dim];
-		double mfcc[][] = new double[bufSize][];
-		Iterator<double[]> it = buf.iterator();
-		int i = 0;
-		while (it.hasNext()) {
-			mfcc[i++] = (double[])it.next();
-		}
-	
-		// Implement the computation of delta MFCC here
-		int M = (bufSize-1)/2;
-		double sum2 = 0.0;
-		for (int m = -M; m <= M; m++) {			// Denominator of deltaMFCC formula
-			sum2 += Math.pow(m,2);
-		}		
-		for (int j = 0; j < dim; j++) {			// For each element in the C0,C1,...
-			double sum1 = 0.0;
-			for (int m = -M; m <= M; m++) {		// Numerator of deltaMFCC formula
-				sum1 += m*mfcc[m+M][j];
-			}
-			if (sum2 != 0.0) {
-				dMfcc[j] = sum1/sum2;
-			}
-		}
-		return dMfcc;	
-	}
+
 }

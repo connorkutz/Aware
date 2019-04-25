@@ -43,7 +43,7 @@ Please visit http://ocvolume.sourceforge.net.
  */
 //package org.ioe.tprsa.audio.feature;
 
-package edu.polyu.mfcc;
+package kutz.connor.Aware;
 
 /**
  * last updated on June 15, 2002<br>
