@@ -1,7 +1,15 @@
-# GW CS Senior Design Project Template
+# Aware
 
-Use the master branch of this repository for your **working** code.  You should use the [Feature Branch](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow) or [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) structure for your code and branches.
+## How to download and get the project working
 
-The gh-pages branch of this repository has starter files for your web page. You should upload PDF versions of all your assignments and keep your web page up to date.
+First, simply download or clone the repository. To install on an Android device, use the provided APK file. Please be sure that your device is running android version 26 or higher. Aditionally, the code can be reviewed and tested in Android Studio, available for free [online](https://developer.android.com/studio).
 
-**Once you understand the structure listed above, you should replace this readme with something specific to your project.**
+No additional tools or libraries are needed for the app to function, and all libraries ara available for inspection within the repository.
+
+## What works, what doesnt work, what to be aware of
+
+The crime hotspot identification system, the active crime alert system, and the active volume management all work. We are currently finalizing the noise dectionion system. We are still trying to find a reliable source for crime alerts, and the name recognition system has yet to be completed 
+
+## Ideas for next steps
+
+One idea is to add the name recognition system, which which could be easily implemented using Google’s Text-to-Speech service. Another option is making the system better for visually impaired users because of the application's heavy use of audio alerts.
